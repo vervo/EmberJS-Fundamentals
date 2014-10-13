@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="js/vendor/jquery-1.10.2.min.js"></script>		
+		<script type="text/javascript" src="js/vendor/ember/handlebars-1.1.2.js"></script>
+		<script type="text/javascript" src="js/vendor/ember/ember-1.6.1.js"></script>
+		<meta charset="utf-8">
+	  	<title>fundamentals</title>
+	</head>
+	<body>
+		<div class="container" id="github-app">
+			
+		</div>
+
+		<script type="text/x-handlebars" data-template-name="application">
+			
+			<div class ="row">
+				<div class ="col-md-12" >			
+					
+					{{outlet}}
+					
+				</div>
+			</div>
+		</script>
+		<script type="text/x-handlebars" data-template-name="index">
+			
+			<h1>github nameshub</h1>
+					<hr />
+					<p>first github emberJS project</p>
+			<ul>			
+			{{#each}}		
+				<li>{{#link-to 'user' this}}{{name}}{{/link-to}}</li>
+			{{/each}}
+			</ul>
+			<p>
+				<button class="btn btn-success" {{action "clicked"}}>Cick Me!</button>
+			</p>
+			<p>{{renderredOn}}</p>
+			<!-- 
+			Everything Starts With the URL
+			A URL Maps to a Route
+			A Route prepares the data
+			A Route prepares the Controller
+			The Controlller ois sshoved into a template.
+			-->
+		</script>
+		<script type="text/x-handlebars" data-template-name="user">
+			<div class"row">
+				<div class="col-md-3">
+					<div class="well">
+						<p class="text-center">
+							{{#link-to 'user' this}}<img {{bind-attr src=avatar_url}} style="width:140px"/>{{/link-to}}
+						</p>
+						<h4>{{#link-to 'user' this}}{{name}}{{/link-to}}</h4>
+						<p>
+							{{company}}<br />
+							{{location}}<br />
+							{{email}}<br />
+						</p>
+						<hr />
+						<table class="table table-striped">
+							<tr>
+								<td>Followers:</td>
+								<td>{{followers}}</td>
+							</tr>
+							<tr>
+								<td>Respsitories:</td>
+								<td>{{public_repos}}</td>
+							</tr>
+							<tr>
+								<td>Gists:</td>
+								<td>{{public_gists}}</td>
+							</tr>
+						</table>
+						<p>
+							{{#link-to 'index'}}Back{{/link-to}}
+						</p>
+					</div>
+				</div>
+			</div>
+			
+		</script>
+	</body>	
+
+	<script>
+		var devs = [
+			{ login: "vervo", name: "Vivien Y"},
+			{ login: "salesman", name: "Sale M"},
+			{ login: "donkykind", name: "Donkey K"},
+			{ login: "crapchen", name: "Crap C"},
+			{ login: "sannyu", name: "Sanny U"},
+		];
+
+   		window.Github = Ember.Application.create({
+   			rootElement : "#github-app"
+   		});
+
+   		Github.IndexRoute = Ember.Route.extend({
+   			model: function (){ return devs }
+   		});
+
+   		Github.IndexController = Ember.ArrayController.extend({
+			renderredOn: function (){
+				return new Date();
+			}.property(),
+			actions : {
+				clicked: function (){
+					alert("I been clicked");
+				}
+			}			
+   		});
+
+   		Github.Router.map(function() {
+   			this.resource("user", {path : "/users/:login"});
+   		});
+
+   		Github.UserRoute = Ember.Route.extend({
+   			model: function (params){    							
+   				return Ember.$.getJSON("https://api.github.com/users/" + params.login);
+   			}
+   		});
+
+
+	</script>
+</html>
